@@ -13,6 +13,46 @@ class Quote(Resource):
                 return quote, 200
         return "Quote not found", 404
 
+    def post(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument("author")
+        parser.add_argument("quote")
+        params = parser.parse_args()
+        for quote in quotes.ai_quotes:
+            if (id == quote["id"]):
+                return f"Quote with id {id} already exists", 400
+        quote = {
+            "id": int(id),
+            "author": params["author"],
+            "quote": params["quote"]
+        }
+        quotes.ai_quotes.append(quote)
+        return quote, 201
+
+    def put(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument("author")
+        parser.add_argument("quote")
+        params = parser.parse_args()
+        for quote in quotes.ai_quotes:
+            if (id == quote["id"]):
+                quote["author"] = params["author"]
+                quote["quote"] = params["quote"]
+                return quote, 200
+
+        quote = {
+            "id": id,
+            "author": params["author"],
+            "quote": params["quote"]
+        }
+
+        quotes.ai_quotes.append(quote)
+        return quote, 201
+
+    def delete(self, id):
+        quotes.ai_quotes = [qoute for qoute in quotes.ai_quotes if qoute["id"] != id]
+        return f"Quote with id {id} is deleted.", 200
+
 
 app = Flask(__name__)
 api = Api(app)
